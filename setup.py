@@ -14,12 +14,12 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 setup(
     name="liveness-cli",
     version="1.0.0",
-    author="Your Name",
-    author_email="your.email@example.com",
+    author="Equipo de Facephi",
+    author_email="geovannymena@facephi.com
     description="CLI para evaluar imágenes con servicios de liveness",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/liveness-cli",
+    url="https://github.com/geo-mena/liveness-cli",
     packages=find_packages(),
     install_requires=requirements,
     classifiers=[
