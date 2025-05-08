@@ -15,8 +15,8 @@ Una herramienta de línea de comandos para evaluar imágenes con servicios de li
 
 1. Clona este repositorio:
    ```
-   git clone https://github.com/usuario/passive-liveness-cli.git
-   cd passive-liveness-cli
+   git clone https://github.com/usuario/liveness-cli.git
+   cd liveness-cli
    ```
 
 2. Instala las dependencias:
@@ -31,7 +31,7 @@ Una herramienta de línea de comandos para evaluar imágenes con servicios de li
 La forma más fácil de usar el CLI es en modo interactivo:
 
 ```
-python passive_liveness_cli.py --interactive
+python liveness_cli.py --interactive
 ```
 
 Esto iniciará un asistente que te guiará a través de todas las opciones.
@@ -42,13 +42,13 @@ También puedes usar el CLI directamente desde la línea de comandos:
 
 ```
 # Evaluar una imagen individual con el servicio SaaS
-python passive_liveness_cli.py --image ruta/a/imagen.jpg --use-saas --output informe.md
+python liveness_cli.py --image ruta/a/imagen.jpg --use-saas --output informe.md
 
 # Evaluar un directorio de imágenes con el servicio SDK en el puerto 8080
-python passive_liveness_cli.py --directory ruta/a/imagenes --use-sdk --sdk-port 8080 --sdk-version "6.12" --output informe.md
+python liveness_cli.py --directory ruta/a/imagenes --use-sdk --sdk-port 8080 --sdk-version "6.12" --output informe.md
 
 # Evaluar con SaaS y múltiples versiones de SDK
-python passive_liveness_cli.py --directory ruta/a/imagenes --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --output informe.md
+python liveness_cli.py --directory ruta/a/imagenes --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --output informe.md
 ```
 
 ## Opciones
@@ -74,6 +74,18 @@ python passive_liveness_cli.py --directory ruta/a/imagenes --use-saas --use-sdk 
 - `--verbose`, `-v`: Mostrar información detallada durante la ejecución
 - `--interactive`, `-i`: Ejecutar en modo interactivo
 
+## Estructura del Código
+
+El código está organizado de la siguiente manera:
+
+- `liveness_cli.py`: Punto de entrada principal
+- `config.py`: Constantes y configuración
+- `image_processor.py`: Procesamiento y evaluación de imágenes
+- `report_generator.py`: Generación de informes
+- `cli_interface.py`: Interfaz de línea de comandos
+
+Esta estructura modular sigue los principios de Clean Code, separando las responsabilidades en diferentes componentes.
+
 ## Formato del Informe
 
 El informe generado es un archivo Markdown con una tabla que incluye:
@@ -96,12 +108,12 @@ El informe generado es un archivo Markdown con una tabla que incluye:
 
 ### Evaluación Básica
 ```
-python passive_liveness_cli.py -i
+python liveness_cli.py -i
 ```
 
 ### Evaluación Avanzada
 ```
-python passive_liveness_cli.py --directory ./imagenes_test --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --output ./informes/informe_$(date +%Y%m%d).md --workers 10 --verbose
+python liveness_cli.py --directory ./imagenes_test --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --output ./informes/informe_$(date +%Y%m%d).md --workers 10 --verbose
 ```
 
 ## Solución de Problemas

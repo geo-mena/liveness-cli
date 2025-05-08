@@ -1,225 +1,21 @@
 #!/usr/bin/env python3
+"""
+Interfaz de línea de comandos para la evaluación de liveness.
+"""
+
 import os
 import sys
-import base64
-import requests
-import argparse
-import pandas as pd
-from typing import List, Dict, Tuple, Optional, Union
-from concurrent.futures import ThreadPoolExecutor
 import time
-import re
-from PIL import Image
-import socket
-from pathlib import Path
-import json
-import urllib.parse
+import argparse
 import inquirer
+from concurrent.futures import ThreadPoolExecutor
+from typing import List, Dict, Optional
 from rich.console import Console
 from rich.progress import Progress, TextColumn, BarColumn, TimeElapsedColumn
-from rich import print as rprint
 
-console = Console()
-
-# Configuración por defecto
-DEFAULT_SAAS_URL = "https://api.identity-platform.io/services/evaluatePassiveLivenessToken"
-DEFAULT_SAAS_API_KEY = "M4D1KZ6bj2LBhXupHWbnnk8E93AmhpGxVPNXY9R4"
-DEFAULT_SDK_BASE_URL = "http://localhost:"
-DEFAULT_SDK_ENDPOINT = "/api/v1/selphid/passive-liveness/evaluate"
-DEFAULT_WORKERS = 5
-
-class ImageProcessor:
-    """Clase para procesar y evaluar imágenes con servicios de liveness."""
-    
-    def __init__(self, verbose=False):
-        self.verbose = verbose
-        self.console = Console()
-    
-    def convert_image_to_base64(self, image_path: str) -> Optional[str]:
-        """Convierte una imagen a formato base64."""
-        try:
-            with open(image_path, "rb") as image_file:
-                return base64.b64encode(image_file.read()).decode('utf-8')
-        except Exception as e:
-            if self.verbose:
-                self.console.print(f"[bold red]Error al convertir la imagen {image_path}: {str(e)}[/bold red]")
-            return None
-    
-    def get_image_info(self, image_path: str) -> Dict:
-        """Obtiene información de la imagen (resolución y tamaño)."""
-        try:
-            img = Image.open(image_path)
-            size_bytes = os.path.getsize(image_path)
-            size_kb = size_bytes / 1024
-            
-            return {
-                "resolution": f"{img.width} x {img.height}",
-                "size": f"{size_kb:.0f} KB"
-            }
-        except Exception as e:
-            if self.verbose:
-                self.console.print(f"[bold red]Error al obtener información de la imagen {image_path}: {str(e)}[/bold red]")
-            return {
-                "resolution": "N/A",
-                "size": "N/A"
-            }
-    
-    def evaluate_with_saas(self, image_path: str, api_url: str, api_key: str) -> Dict:
-        """Evalúa una imagen con el servicio SaaS de liveness."""
-        try:
-            # Convertir imagen a base64
-            image_base64 = self.convert_image_to_base64(image_path)
-            if not image_base64:
-                return {"error": "Error al convertir imagen a base64"}
-            
-            # Preparar datos para la solicitud
-            payload = {
-                "imageBuffer": image_base64
-            }
-            
-            # Configurar encabezados
-            headers = {
-                "x-api-key": api_key,
-                "Content-Type": "application/json"
-            }
-            
-            # Enviar solicitud a la API
-            response = requests.post(api_url, json=payload, headers=headers)
-            
-            # Verificar si la solicitud fue exitosa
-            if response.status_code == 200:
-                result = response.json()
-                return {
-                    "status": "success",
-                    "diagnostic": result.get("serviceResultLog", "Sin resultado")
-                }
-            else:
-                return {
-                    "status": "error",
-                    "diagnostic": f"Error: {response.status_code} - {response.text}"
-                }
-        
-        except Exception as e:
-            return {
-                "status": "error",
-                "diagnostic": f"Error: {str(e)}"
-            }
-    
-    def evaluate_with_sdk(self, image_path: str, sdk_url: str) -> Dict:
-        """Evalúa una imagen con el servicio SDK de liveness."""
-        try:
-            # Convertir imagen a base64
-            image_base64 = self.convert_image_to_base64(image_path)
-            if not image_base64:
-                return {"error": "Error al convertir imagen a base64"}
-            
-            # Preparar datos para la solicitud
-            payload = {
-                "image": image_base64
-            }
-            
-            # Enviar solicitud a la API
-            response = requests.post(sdk_url, json=payload)
-            
-            # Verificar si la solicitud fue exitosa
-            if response.status_code == 200:
-                result = response.json()
-                return {
-                    "status": "success",
-                    "diagnostic": result.get("diagnostic", "Sin diagnóstico")
-                }
-            else:
-                return {
-                    "status": "error",
-                    "diagnostic": f"Error: {response.status_code} - {response.text}"
-                }
-        
-        except requests.exceptions.ConnectionError:
-            return {
-                "status": "error",
-                "diagnostic": f"Error de conexión: No se pudo conectar a {sdk_url}. Verifique que el servicio esté activo en ese puerto."
-            }
-        except Exception as e:
-            return {
-                "status": "error",
-                "diagnostic": f"Error: {str(e)}"
-            }
-
-    def check_port_open(self, port: int) -> bool:
-        """Comprueba si un puerto está abierto."""
-        sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        result = False
-        try:
-            sock.settimeout(2)
-            result = sock.connect_ex(('localhost', port)) == 0
-        except:
-            pass
-        finally:
-            sock.close()
-        return result
-
-
-class MarkdownReportGenerator:
-    """Clase para generar informes en formato Markdown."""
-    
-    def __init__(self, output_path: str, image_dir: str):
-        self.output_path = output_path
-        self.image_dir = image_dir
-        
-    def generate_report(self, results: List[Dict]) -> str:
-        """Genera un informe en formato Markdown con los resultados de la evaluación."""
-        
-        # Crear directorio de salida si no existe
-        os.makedirs(os.path.dirname(os.path.abspath(self.output_path)), exist_ok=True)
-        
-        # Determinar columnas basadas en el primer resultado que debería tener todas las columnas
-        if not results:
-            return ""
-        
-        # Crear encabezado de la tabla
-        header = "| Title | "
-        header_separator = "| ----- | "
-        
-        # Añadir columnas fijas
-        fixed_columns = ["Foto", "Resolución", "Tamaño"]
-        header += " | ".join(fixed_columns) + " | "
-        header_separator += " | ".join(["-" * len(col) for col in fixed_columns]) + " | "
-        
-        # Añadir columnas dinámicas (SaaS y SDK versiones)
-        dynamic_columns = [col for col in results[0].keys() if col.startswith("Diagnostic")]
-        if dynamic_columns:
-            header += " | ".join(dynamic_columns) + " |"
-            header_separator += " | ".join(["-" * len(col) for col in dynamic_columns]) + " |"
-        else:
-            # Eliminar el último " | " si no hay columnas dinámicas
-            header = header[:-3] + " |"
-            header_separator = header_separator[:-3] + " |"
-        
-        # Iniciar contenido del informe
-        report_content = f"{header}\n{header_separator}\n"
-        
-        # Añadir filas
-        for result in results:
-            row = f"| {result['Title']} | "
-            
-            # Añadir columnas fijas
-            row += f"![Foto]({result['ImagePath']}) | {result['Resolución']} | {result['Tamaño']} | "
-            
-            # Añadir columnas dinámicas
-            if dynamic_columns:
-                row += " | ".join([result[col] for col in dynamic_columns]) + " |"
-            else:
-                # Eliminar el último " | " si no hay columnas dinámicas
-                row = row[:-3] + " |"
-            
-            report_content += f"{row}\n"
-        
-        # Guardar informe
-        with open(self.output_path, "w", encoding="utf-8") as f:
-            f.write(report_content)
-        
-        return report_content
-
+from config import DEFAULT_SAAS_API_KEY, DEFAULT_SAAS_URL, DEFAULT_WORKERS, VALID_IMAGE_EXTENSIONS
+from image_processor import ImageProcessor
+from report_generator import MarkdownReportGenerator
 
 class LivenessEvaluatorCLI:
     """CLI para evaluar imágenes con servicios de liveness."""
@@ -492,7 +288,7 @@ class LivenessEvaluatorCLI:
         elif directory_path:
             if os.path.isdir(directory_path):
                 for filename in os.listdir(directory_path):
-                    if filename.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.tiff')):
+                    if filename.lower().endswith(VALID_IMAGE_EXTENSIONS):
                         images.append(os.path.join(directory_path, filename))
                 
                 if not images:
@@ -579,7 +375,7 @@ class LivenessEvaluatorCLI:
                 # Evaluar con SDK
                 if use_sdk:
                     for i, (port, version) in enumerate(zip(sdk_ports, sdk_versions)):
-                        sdk_url = f"{DEFAULT_SDK_BASE_URL}{port}{DEFAULT_SDK_ENDPOINT}"
+                        sdk_url = self.image_processor.get_sdk_url(port)
                         sdk_result = self.image_processor.evaluate_with_sdk(image_path, sdk_url)
                         result[f"Diagnostic SDK {version}"] = sdk_result.get("diagnostic", "Error")
                 
@@ -662,9 +458,3 @@ class LivenessEvaluatorCLI:
                 import traceback
                 self.console.print(traceback.format_exc())
             return False
-
-
-if __name__ == "__main__":
-    cli = LivenessEvaluatorCLI()
-    success = cli.run()
-    sys.exit(0 if success else 1)
