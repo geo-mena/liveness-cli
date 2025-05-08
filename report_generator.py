@@ -12,6 +12,10 @@ class MarkdownReportGenerator:
     def __init__(self, output_path: str, image_dir: str):
         self.output_path = output_path
         self.image_dir = image_dir
+
+        # Dimensiones estándar para las imágenes
+        self.image_width = 120
+        self.image_height = 160
         
     def generate_report(self, results: List[Dict]) -> str:
         """Genera un informe en formato Markdown con los resultados de la evaluación."""
@@ -28,7 +32,7 @@ class MarkdownReportGenerator:
         header_separator = "| ----- | "
         
         # Añadir columnas fijas
-        fixed_columns = ["Foto", "Resolución", "Tamaño"]
+        fixed_columns = ["Photo", "Resolution", "Size"]
         header += " | ".join(fixed_columns) + " | "
         header_separator += " | ".join(["-" * len(col) for col in fixed_columns]) + " | "
         
@@ -50,7 +54,7 @@ class MarkdownReportGenerator:
             row = f"| {result['Title']} | "
             
             # Añadir columnas fijas
-            row += f"![Foto]({result['ImagePath']}) | {result['Resolución']} | {result['Tamaño']} | "
+            row += f"<img src=\"{result['ImagePath']}\" width=\"{self.image_width}\" height=\"{self.image_height}\" alt=\"Photo\"> | {result['Resolución']} | {result['Tamaño']} | "
             
             # Añadir columnas dinámicas
             if dynamic_columns:
