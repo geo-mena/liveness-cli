@@ -14,13 +14,13 @@ Una herramienta de línea de comandos para evaluar imágenes con servicios de li
 ## Instalación
 
 1. Clona este repositorio:
-   ```
+   ```bash
    git clone https://github.com/geo-mena/liveness-cli.git
    cd liveness-cli
    ```
 
 2. Instala las dependencias:
-   ```
+   ```bash
    pip install -r requirements.txt
    ```
 
@@ -30,7 +30,7 @@ Una herramienta de línea de comandos para evaluar imágenes con servicios de li
 
 La forma más fácil de usar el CLI es en modo interactivo:
 
-```
+```bash
 python liveness_cli.py --interactive
 ```
 
@@ -40,7 +40,7 @@ Esto iniciará un asistente que te guiará a través de todas las opciones.
 
 También puedes usar el CLI directamente desde la línea de comandos:
 
-```
+```bash
 # Evaluar una imagen individual con el servicio SaaS
 python liveness_cli.py --image ruta/a/imagen.jpg --use-saas --output informe.md
 
@@ -107,12 +107,12 @@ El informe generado es un archivo Markdown con una tabla que incluye:
 ## Ejemplos
 
 ### Evaluación Básica
-```
+```bash
 python liveness_cli.py -i
 ```
 
 ### Evaluación Avanzada
-```
+```bash
 python liveness_cli.py --directory ./imagenes_test --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --output ./informes/informe_$(date +%Y%m%d).md --workers 10 --verbose
 ```
 
