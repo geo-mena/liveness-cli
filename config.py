@@ -14,3 +14,18 @@ DEFAULT_WORKERS = 5
 
 # Extensiones de imágenes válidas
 VALID_IMAGE_EXTENSIONS = ('.png', '.jpg', '.jpeg', '.bmp', '.tiff')
+
+# Extensiones de archivos de texto válidas (para base64)
+VALID_TXT_EXTENSIONS = ('.txt',)
+
+# Configuración de timeouts (en segundos)
+REQUEST_TIMEOUT = 30
+PORT_CHECK_TIMEOUT = 2
+
+# Configuración del reporte
+DEFAULT_OUTPUT_FILE = "informe_liveness.md"
+TEMP_IMAGES_DIR = "temp_images"
+
+# Configuración de la imagen temporal (para archivos .txt convertidos)
+DEFAULT_IMAGE_QUALITY = 85
+DEFAULT_IMAGE_FORMAT = 'JPEG'

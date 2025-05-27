@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """
 Interfaz de línea de comandos para la evaluación de liveness.
+Soporta tanto archivos de imagen tradicionales como archivos .txt con contenido base64.
 """
 
 import os
@@ -17,6 +18,9 @@ from config import DEFAULT_SAAS_API_KEY, DEFAULT_SAAS_URL, DEFAULT_WORKERS, VALI
 from image_processor import ImageProcessor
 from report_generator import MarkdownReportGenerator
 
+# Agregar constante para archivos .txt (agregar esto a config.py también)
+VALID_TXT_EXTENSIONS = ('.txt',)
+
 class LivenessEvaluatorCLI:
     """CLI para evaluar imágenes con servicios de liveness."""
     
@@ -27,7 +31,8 @@ class LivenessEvaluatorCLI:
     def parse_arguments(self):
         """Parsea los argumentos de línea de comandos."""
         parser = argparse.ArgumentParser(
-            description="CLI para evaluar imágenes con servicios de liveness.",
+            description="CLI para evaluar imágenes con servicios de liveness. "
+                       "Soporta archivos de imagen tradicionales y archivos .txt con base64.",
             formatter_class=argparse.ArgumentDefaultsHelpFormatter
         )
         
@@ -35,13 +40,17 @@ class LivenessEvaluatorCLI:
         parser.add_argument("--interactive", "-i", action="store_true", 
                           help="Ejecuta el CLI en modo interactivo")
         
-        # Argumentos para las imágenes
-        image_group = parser.add_argument_group("Configuración de imágenes")
-        image_source = image_group.add_mutually_exclusive_group()
-        image_source.add_argument("--image", "-img", type=str,
+        # Argumentos para las fuentes de datos
+        source_group = parser.add_argument_group("Configuración de fuentes de datos")
+        source_source = source_group.add_mutually_exclusive_group()
+        source_source.add_argument("--image", "-img", type=str,
                                help="Ruta a una imagen individual para evaluar")
-        image_source.add_argument("--directory", "-dir", type=str,
+        source_source.add_argument("--directory", "-dir", type=str,
                                 help="Directorio que contiene imágenes para evaluar")
+        source_source.add_argument("--txt-file", "-txt", type=str,
+                               help="Ruta a un archivo .txt con base64 para evaluar")
+        source_source.add_argument("--txt-directory", "-txtdir", type=str,
+                                help="Directorio que contiene archivos .txt con base64")
         
         # Argumentos para el servicio SaaS
         saas_group = parser.add_argument_group("Configuración de SaaS")
@@ -84,12 +93,16 @@ class LivenessEvaluatorCLI:
                 choices=[
                     ('Imagen individual', 'image'),
                     ('Directorio de imágenes', 'directory'),
+                    ('Archivo .txt individual con base64', 'txt_file'),
+                    ('Directorio de archivos .txt con base64', 'txt_directory'),
                 ],
             ),
         ]
         image_answers = inquirer.prompt(image_questions)
         
-        if image_answers['source'] == 'image':
+        source_type = image_answers['source']
+        
+        if source_type == 'image':
             image_path_question = [
                 inquirer.Path(
                     'path',
@@ -101,7 +114,27 @@ class LivenessEvaluatorCLI:
             image_path_answer = inquirer.prompt(image_path_question)
             image_path = image_path_answer['path']
             directory_path = None
-        else:
+            is_txt_mode = False
+        elif source_type == 'txt_file':
+            txt_path_question = [
+                inquirer.Path(
+                    'path',
+                    message='Ingrese la ruta al archivo .txt con base64:',
+                    exists=True,
+                    path_type=inquirer.Path.FILE,
+                ),
+            ]
+            txt_path_answer = inquirer.prompt(txt_path_question)
+            image_path = txt_path_answer['path']
+            directory_path = None
+            is_txt_mode = True
+            
+            # Validar que sea un archivo .txt válido
+            if not self.image_processor.validate_txt_file(image_path):
+                self.console.print("[bold red]Error: El archivo seleccionado no contiene base64 válido.[/bold red]")
+                return False
+                
+        elif source_type == 'directory':
             directory_path_question = [
                 inquirer.Path(
                     'path',
@@ -113,6 +146,26 @@ class LivenessEvaluatorCLI:
             directory_path_answer = inquirer.prompt(directory_path_question)
             directory_path = directory_path_answer['path']
             image_path = None
+            is_txt_mode = False
+        else:  # txt_directory
+            directory_path_question = [
+                inquirer.Path(
+                    'path',
+                    message='Ingrese la ruta al directorio de archivos .txt con base64:',
+                    exists=True,
+                    path_type=inquirer.Path.DIRECTORY,
+                ),
+            ]
+            directory_path_answer = inquirer.prompt(directory_path_question)
+            directory_path = directory_path_answer['path']
+            image_path = None
+            is_txt_mode = True
+            
+            # Verificar que haya archivos .txt en el directorio
+            txt_files = [f for f in os.listdir(directory_path) if f.lower().endswith(VALID_TXT_EXTENSIONS)]
+            if not txt_files:
+                self.console.print("[bold red]Error: No se encontraron archivos .txt en el directorio especificado.[/bold red]")
+                return False
         
         # Preguntar por los servicios a utilizar
         service_questions = [
@@ -228,11 +281,13 @@ class LivenessEvaluatorCLI:
         # Confirmar la configuración
         self.console.print("\n[bold blue]Resumen de configuración:[/bold blue]")
         if image_path:
-            self.console.print(f"Imagen: {image_path}")
+            file_type = "Archivo .txt" if is_txt_mode else "Imagen"
+            self.console.print(f"{file_type}: {image_path}")
         if directory_path:
-            self.console.print(f"Directorio: {directory_path}")
+            dir_type = "Directorio de archivos .txt" if is_txt_mode else "Directorio de imágenes"
+            self.console.print(f"{dir_type}: {directory_path}")
         if service_answers['use_saas']:
-            self.console.print(f"SaaS API Key: {saas_api_key[:5]}...{saas_api_key[-5:]}")
+            self.console.print(f"SaaS API Key: {saas_api_key[:5]}...{saas_api_key[-5:] if len(saas_api_key) > 10 else saas_api_key}")
         if service_answers['use_sdk']:
             for i, (port, version) in enumerate(zip(sdk_ports, sdk_versions)):
                 self.console.print(f"SDK {i+1}: Puerto {port}, Versión {version}")
@@ -251,7 +306,7 @@ class LivenessEvaluatorCLI:
         
         if not confirm_answer['confirm']:
             self.console.print("[bold yellow]Operación cancelada por el usuario.[/bold yellow]")
-            return
+            return False
         
         # Ejecutar la evaluación
         return self.run_evaluation(
@@ -265,42 +320,70 @@ class LivenessEvaluatorCLI:
             output_path=output_path,
             workers=workers,
             verbose=verbose,
+            is_txt_mode=is_txt_mode,
         )
     
     def run_evaluation(self, image_path=None, directory_path=None, use_saas=False, 
                       saas_api_key=DEFAULT_SAAS_API_KEY, use_sdk=False, sdk_ports=None, 
                       sdk_versions=None, output_path="informe_liveness.md", workers=DEFAULT_WORKERS, 
-                      verbose=False):
+                      verbose=False, is_txt_mode=False):
         """Ejecuta la evaluación de imágenes."""
         # Configurar el procesador de imágenes con verbosidad
         self.image_processor = ImageProcessor(verbose=verbose)
         
-        # Recopilar imágenes para procesar
-        images = []
+        # Recopilar archivos para procesar
+        files_to_process = []
         
         if image_path:
             if os.path.isfile(image_path):
-                images.append(image_path)
+                files_to_process.append(image_path)
             else:
-                self.console.print(f"[bold red]Error: La imagen {image_path} no existe o no es accesible.[/bold red]")
+                file_type = "archivo .txt" if is_txt_mode else "imagen"
+                self.console.print(f"[bold red]Error: El {file_type} {image_path} no existe o no es accesible.[/bold red]")
                 return False
         
         elif directory_path:
             if os.path.isdir(directory_path):
                 for filename in os.listdir(directory_path):
-                    if filename.lower().endswith(VALID_IMAGE_EXTENSIONS):
-                        images.append(os.path.join(directory_path, filename))
+                    if is_txt_mode:
+                        # Buscar archivos .txt
+                        if filename.lower().endswith(VALID_TXT_EXTENSIONS):
+                            file_path = os.path.join(directory_path, filename)
+                            files_to_process.append(file_path)
+                    else:
+                        # Buscar archivos de imagen
+                        if filename.lower().endswith(VALID_IMAGE_EXTENSIONS):
+                            file_path = os.path.join(directory_path, filename)
+                            files_to_process.append(file_path)
                 
-                if not images:
-                    self.console.print(f"[bold red]Error: No se encontraron imágenes en el directorio {directory_path}.[/bold red]")
+                if not files_to_process:
+                    file_type = "archivos .txt" if is_txt_mode else "imágenes"
+                    self.console.print(f"[bold red]Error: No se encontraron {file_type} en el directorio {directory_path}.[/bold red]")
                     return False
             else:
                 self.console.print(f"[bold red]Error: El directorio {directory_path} no existe o no es accesible.[/bold red]")
                 return False
         
         else:
-            self.console.print("[bold red]Error: Debe proporcionar una imagen o un directorio de imágenes.[/bold red]")
+            file_type = "archivo .txt" if is_txt_mode else "imagen"
+            self.console.print(f"[bold red]Error: Debe proporcionar un {file_type} o un directorio de {file_type}s.[/bold red]")
             return False
+        
+        # Validar archivos si es modo .txt
+        if is_txt_mode:
+            validation_result = self.image_processor.batch_validate_files(files_to_process, is_txt_mode=True)
+            
+            if validation_result['invalid_count'] > 0:
+                self.console.print(f"[bold yellow]Advertencia: {validation_result['invalid_count']} archivo(s) .txt contienen base64 inválido y serán omitidos.[/bold yellow]")
+                if verbose:
+                    for invalid_file in validation_result['invalid_files']:
+                        self.console.print(f"  - {invalid_file}")
+                
+                files_to_process = validation_result['valid_files']
+                
+                if not files_to_process:
+                    self.console.print("[bold red]Error: No hay archivos .txt válidos para procesar.[/bold red]")
+                    return False
         
         # Verificar que al menos un servicio esté habilitado
         if not use_saas and not use_sdk:
@@ -335,31 +418,55 @@ class LivenessEvaluatorCLI:
         temp_img_dir = os.path.join(output_dir, "temp_images")
         os.makedirs(temp_img_dir, exist_ok=True)
         
-        # Iniciar procesamiento de imágenes
-        self.console.print(f"[bold green]Iniciando evaluación de {len(images)} imágenes...[/bold green]")
+        # Iniciar procesamiento
+        file_type = "archivos .txt" if is_txt_mode else "imágenes"
+        self.console.print(f"[bold green]Iniciando evaluación de {len(files_to_process)} {file_type}...[/bold green]")
         
         results = []
         start_time = time.time()
         
-        # Función para procesar una imagen
-        def process_image(image_path):
+        # Función para procesar un archivo
+        def process_file(file_path):
             try:
-                base_filename = os.path.basename(image_path)
-                image_title = os.path.splitext(base_filename)[0]
+                base_filename = os.path.basename(file_path)
+                file_title = os.path.splitext(base_filename)[0]
                 
-                # Copiar imagen al directorio temporal
-                temp_img_path = os.path.join(temp_img_dir, base_filename)
-                with open(image_path, "rb") as src_file, open(temp_img_path, "wb") as dst_file:
-                    dst_file.write(src_file.read())
-                
-                # URL relativa para el informe
-                relative_img_path = os.path.join("temp_images", base_filename)
-                
-                # Obtener información de la imagen
-                image_info = self.image_processor.get_image_info(image_path)
+                if is_txt_mode:
+                    # Leer base64 del archivo .txt
+                    base64_content = self.image_processor.read_base64_from_txt(file_path)
+                    if not base64_content:
+                        return {
+                            "Title": file_title,
+                            "ImagePath": "N/A",
+                            "Resolución": "N/A",
+                            "Tamaño": "N/A",
+                            **{f"Diagnostic {service}": "Error: Base64 inválido" for service in 
+                              (["SaaS"] if use_saas else []) + 
+                              ([f"SDK {v}" for v in sdk_versions] if use_sdk else [])}
+                        }
+                    
+                    # Crear imagen temporal desde base64 para el reporte
+                    temp_img_filename = f"{file_title}.jpg"
+                    temp_img_path = os.path.join(temp_img_dir, temp_img_filename)
+                    
+                    if self.image_processor.create_placeholder_image_from_base64(base64_content, temp_img_path):
+                        relative_img_path = os.path.join("temp_images", temp_img_filename)
+                    else:
+                        relative_img_path = "N/A"
+                    
+                    # Obtener información de la imagen desde base64
+                    image_info = self.image_processor.get_image_info_from_base64(base64_content, file_title)
+                else:
+                    # Copiar imagen al directorio temporal
+                    temp_img_path = os.path.join(temp_img_dir, base_filename)
+                    with open(file_path, "rb") as src_file, open(temp_img_path, "wb") as dst_file:
+                        dst_file.write(src_file.read())
+                    
+                    relative_img_path = os.path.join("temp_images", base_filename)
+                    image_info = self.image_processor.get_image_info(file_path)
                 
                 result = {
-                    "Title": image_title,
+                    "Title": file_title,
                     "ImagePath": relative_img_path,
                     "Resolución": image_info["resolution"],
                     "Tamaño": image_info["size"]
@@ -368,7 +475,7 @@ class LivenessEvaluatorCLI:
                 # Evaluar con SaaS
                 if use_saas:
                     saas_result = self.image_processor.evaluate_with_saas(
-                        image_path, DEFAULT_SAAS_URL, saas_api_key
+                        file_path, DEFAULT_SAAS_URL, saas_api_key, is_txt_mode
                     )
                     result["Diagnostic SaaS"] = saas_result.get("diagnostic", "Error")
                 
@@ -376,16 +483,16 @@ class LivenessEvaluatorCLI:
                 if use_sdk:
                     for i, (port, version) in enumerate(zip(sdk_ports, sdk_versions)):
                         sdk_url = self.image_processor.get_sdk_url(port)
-                        sdk_result = self.image_processor.evaluate_with_sdk(image_path, sdk_url)
+                        sdk_result = self.image_processor.evaluate_with_sdk(file_path, sdk_url, is_txt_mode)
                         result[f"Diagnostic SDK {version}"] = sdk_result.get("diagnostic", "Error")
                 
                 return result
             
             except Exception as e:
                 if verbose:
-                    self.console.print(f"[bold red]Error al procesar la imagen {image_path}: {str(e)}[/bold red]")
+                    self.console.print(f"[bold red]Error al procesar el archivo {file_path}: {str(e)}[/bold red]")
                 return {
-                    "Title": os.path.basename(image_path),
+                    "Title": os.path.basename(file_path),
                     "ImagePath": "N/A",
                     "Resolución": "N/A",
                     "Tamaño": "N/A",
@@ -394,19 +501,20 @@ class LivenessEvaluatorCLI:
                       ([f"SDK {v}" for v in sdk_versions] if use_sdk else [])}
                 }
         
-        # Procesar imágenes en paralelo con barra de progreso
+        # Procesar archivos en paralelo con barra de progreso
         with Progress(
             TextColumn("[bold blue]{task.description}"),
             BarColumn(),
             TextColumn("[bold green]{task.completed}/{task.total}"),
             TimeElapsedColumn(),
         ) as progress:
-            task = progress.add_task("[bold green]Procesando imágenes...", total=len(images))
+            task_description = f"[bold green]Procesando {file_type}..."
+            task = progress.add_task(task_description, total=len(files_to_process))
             
             with ThreadPoolExecutor(max_workers=workers) as executor:
                 futures = []
-                for image_path in images:
-                    futures.append(executor.submit(process_image, image_path))
+                for file_path in files_to_process:
+                    futures.append(executor.submit(process_file, file_path))
                 
                 for future in futures:
                     results.append(future.result())
@@ -422,7 +530,8 @@ class LivenessEvaluatorCLI:
         
         # Mostrar resumen
         elapsed_time = time.time() - start_time
-        self.console.print(f"[bold green]Evaluación completada en {elapsed_time:.2f} segundos.[/bold green]")
+        file_type = "archivos .txt" if is_txt_mode else "imágenes"
+        self.console.print(f"[bold green]Evaluación de {len(results)} {file_type} completada en {elapsed_time:.2f} segundos.[/bold green]")
         self.console.print(f"[bold green]Informe generado en: {output_path}[/bold green]")
         
         return True
@@ -435,9 +544,16 @@ class LivenessEvaluatorCLI:
             if args.interactive:
                 return self.interactive_mode()
             else:
+                # Determinar si es modo txt
+                is_txt_mode = bool(args.txt_file or args.txt_directory)
+                
+                # Determinar paths
+                image_path = args.image or args.txt_file
+                directory_path = args.directory or args.txt_directory
+                
                 return self.run_evaluation(
-                    image_path=args.image,
-                    directory_path=args.directory,
+                    image_path=image_path,
+                    directory_path=directory_path,
                     use_saas=args.use_saas,
                     saas_api_key=args.saas_api_key,
                     use_sdk=args.use_sdk,
@@ -446,6 +562,7 @@ class LivenessEvaluatorCLI:
                     output_path=args.output,
                     workers=args.workers,
                     verbose=args.verbose,
+                    is_txt_mode=is_txt_mode,
                 )
         
         except KeyboardInterrupt:
@@ -454,7 +571,25 @@ class LivenessEvaluatorCLI:
         
         except Exception as e:
             self.console.print(f"[bold red]Error inesperado: {str(e)}[/bold red]")
-            if args.verbose:
+            if hasattr(args, 'verbose') and args.verbose:
                 import traceback
                 self.console.print(traceback.format_exc())
             return False
+
+
+def main():
+    """Función principal del programa."""
+    try:
+        cli = LivenessEvaluatorCLI()
+        success = cli.run()
+        sys.exit(0 if success else 1)
+    except KeyboardInterrupt:
+        print("\nOperación interrumpida por el usuario.")
+        sys.exit(1)
+    except Exception as e:
+        print(f"Error fatal: {e}")
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
