@@ -96,15 +96,40 @@ python liveness_cli.py --directory ruta/a/imagenes --use-saas --use-sdk --sdk-po
 
 ## 🏗️ Estructura del Código
 
-El código está organizado de la siguiente manera:
+El código está organizado con una arquitectura modular escalable:
 
-- `liveness_cli.py`: Punto de entrada principal
-- `config.py`: Constantes y configuración
-- `image_processor.py`: Procesamiento y evaluación de imágenes
-- `report_generator.py`: Generación de informes
-- `cli_interface.py`: Interfaz de línea de comandos
+```shell
+liveness-cli/
+├── README.md                  # Documentación del proyecto
+├── __init__.py                # Inicialización del paquete
+├── liveness_cli.py            # Punto de entrada principal
+├── requirements.txt           # Dependencias del proyecto
+├── setup.py                   # Script de instalación
+└── src/                       # Paquete principal del proyecto
+    ├── __init__.py
+    ├── cli.py                 # Coordinador principal del CLI
+    ├── commands/              # Comandos CLI modulares
+    │   ├── __init__.py
+    │   ├── evaluate.py        # Comando de evaluación
+    │   └── interactive.py     # Comando modo interactivo
+    ├── core/                  # Lógica de negocio central
+    │   ├── __init__.py
+    │   ├── image_processor.py # Procesamiento de imágenes
+    │   └── report_generator.py# Generación de reportes
+    └── utils/                 # Utilidades y herramientas auxiliares
+        ├── __init__.py
+        ├── config.py          # Configuraciones del sistema
+        └── helpers.py         # Funciones utilitarias compartidas
+```
 
-Esta estructura modular sigue los principios de Clean Code, separando las responsabilidades en diferentes componentes.
+### Arquitectura
+
+- **`src/commands/`**: Comandos CLI separados por responsabilidad
+- **`src/core/`**: Lógica de negocio (procesamiento, reportes)
+- **`src/utils/`**: Utilidades compartidas (configuración, helpers)
+- **`backup/`**: Versión original completa para referencia
+
+Esta estructura modular sigue los principios de Clean Code, separando las responsabilidades en diferentes componentes y facilitando el mantenimiento y escalabilidad futura.
 
 ## 📄 Formato del Informe
 
