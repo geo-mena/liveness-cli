@@ -1,8 +1,28 @@
-# Passive Liveness CLI
+<div align="center">
+
+# 🔍 Passive Liveness CLI
 
 Una herramienta de línea de comandos para evaluar imágenes con servicios de liveness, utilizando tanto APIs SaaS como SDKs locales.
 
-## Características
+[![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/geo-mena/liveness-cli)
+[![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.7%2B-blue)](https://python.org)
+[![Platform](https://img.shields.io/badge/platform-Linux%20%7C%20macOS%20%7C%20Windows-lightgrey)](https://github.com/geo-mena/liveness-cli)
+
+</div>
+
+## 📋 Tabla de Contenidos
+- [✨ Características](#-características)
+- [📦 Instalación](#-instalación)
+- [⚡ Uso](#-uso)
+- [⚙️ Opciones](#️-opciones)
+- [🏗️ Estructura del Código](#️-estructura-del-código)
+- [📄 Formato del Informe](#-formato-del-informe)
+- [📋 Requisitos](#-requisitos)
+- [📸 Ejemplos](#-ejemplos)
+- [🛠️ Solución de Problemas](#️-solución-de-problemas)
+
+## ✨ Características
 
 - Evaluación de imágenes individuales o directorios completos
 - Integración con servicios SaaS (Identity Platform) y SDK local
@@ -11,7 +31,7 @@ Una herramienta de línea de comandos para evaluar imágenes con servicios de li
 - Interfaz interactiva y modo de línea de comandos
 - Procesamiento paralelo para mayor velocidad
 
-## Instalación
+## 📦 Instalación
 
 1. Clona este repositorio:
    ```bash
@@ -24,7 +44,7 @@ Una herramienta de línea de comandos para evaluar imágenes con servicios de li
    pip install -r requirements.txt
    ```
 
-## Uso
+## ⚡ Uso
 
 ### Modo Interactivo
 
@@ -51,7 +71,7 @@ python liveness_cli.py --directory ruta/a/imagenes --use-sdk --sdk-port 8080 --s
 python liveness_cli.py --directory ruta/a/imagenes --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --output informe.md
 ```
 
-## Opciones
+## ⚙️ Opciones
 
 ### Configuración de Imágenes
 - `--image`, `-img`: Ruta a una imagen individual para evaluar
@@ -74,7 +94,7 @@ python liveness_cli.py --directory ruta/a/imagenes --use-saas --use-sdk --sdk-po
 - `--verbose`, `-v`: Mostrar información detallada durante la ejecución
 - `--interactive`, `-i`: Ejecutar en modo interactivo
 
-## Estructura del Código
+## 🏗️ Estructura del Código
 
 El código está organizado de la siguiente manera:
 
@@ -86,7 +106,7 @@ El código está organizado de la siguiente manera:
 
 Esta estructura modular sigue los principios de Clean Code, separando las responsabilidades en diferentes componentes.
 
-## Formato del Informe
+## 📄 Formato del Informe
 
 El informe generado es un archivo Markdown con una tabla que incluye:
 
@@ -97,14 +117,14 @@ El informe generado es un archivo Markdown con una tabla que incluye:
 - Diagnóstico SaaS (si se habilitó)
 - Diagnóstico SDK para cada versión (si se habilitó)
 
-## Requisitos
+## 📋 Requisitos
 
 - Python 3.7 o superior
 - Dependencias listadas en `requirements.txt`
 - Para la evaluación con SDK: servicio SDK funcionando en los puertos especificados
 - Para la evaluación con SaaS: conexión a Internet y API key válida
 
-## Ejemplos
+## 📸 Ejemplos
 
 ### Evaluación Básica
 ```bash
@@ -116,7 +136,7 @@ python liveness_cli.py -i
 python liveness_cli.py --directory ./imagenes_test --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --output ./informes/informe_$(date +%Y%m%d).md --workers 10 --verbose
 ```
 
-## Solución de Problemas
+## 🛠️ Solución de Problemas
 
 - **Error de conexión al SDK**: Asegúrate de que el servicio SDK esté ejecutándose en el puerto especificado.
 - **Error en la API SaaS**: Verifica que la API key sea válida y tengas conexión a Internet.
