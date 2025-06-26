@@ -1,0 +1,3 @@
+"""
+Submódulo de comandos CLI.
+"""

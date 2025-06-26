@@ -13,9 +13,9 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 
 setup(
     name="liveness-cli",
-    version="1.0.0",
+    version="1.1.0",
     author="Equipo de Facephi",
-    author_email="geovannymena@facephi.com
+    author_email="geovannymena@facephi.com",
     description="CLI para evaluar imágenes con servicios de liveness",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -30,7 +30,7 @@ setup(
     python_requires=">=3.7",
     entry_points={
         "console_scripts": [
-            "liveness-cli=liveness_cli.liveness_cli:main",
+            "liveness-cli=src.cli:main",
         ],
     },
 )
