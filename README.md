@@ -26,6 +26,7 @@ Una herramienta de línea de comandos para evaluar imágenes con servicios de li
 
 - Evaluación de imágenes individuales o directorios completos
 - Integración con servicios SaaS (Identity Platform) y SDK local
+- **Análisis de calidad JPEG** mediante servicio web especializado
 - Soporte para múltiples versiones del SDK (hasta 3)
 - Generación de informes en formato Markdown
 - Interfaz interactiva y modo de línea de comandos
@@ -64,11 +65,32 @@ También puedes usar el CLI directamente desde la línea de comandos:
 # Evaluar una imagen individual con el servicio SaaS
 python liveness_cli.py --image ruta/a/imagen.jpg --use-saas --output informe.md
 
+# Evaluar un directorio de imágenes con análisis de calidad JPEG
+python liveness_cli.py --directory ruta/a/imagenes --use-saas --analyze-jpeg-quality --output informe.md
+
 # Evaluar un directorio de imágenes con el servicio SDK en el puerto 8080
 python liveness_cli.py --directory ruta/a/imagenes --use-sdk --sdk-port 8080 --sdk-version "6.12" --output informe.md
 
-# Evaluar con SaaS y múltiples versiones de SDK
-python liveness_cli.py --directory ruta/a/imagenes --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --output informe.md
+# Evaluar con SaaS, SDK y análisis JPEG
+python liveness_cli.py --directory ruta/a/imagenes --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --analyze-jpeg-quality --output informe.md
+```
+
+## 🔍 Análisis de Calidad JPEG
+
+El CLI incluye funcionalidad avanzada para analizar la calidad de compresión de imágenes JPEG:
+
+- **Servicio web especializado**: Utiliza un endpoint externo para análisis preciso
+- **Solo imágenes JPEG**: La funcionalidad está diseñada específicamente para archivos JPEG
+- **Resultados numéricos**: Muestra el porcentaje de calidad (ej: 85%)
+- **Detección de errores**: Maneja casos de imágenes corruptas o conexión fallida
+
+### Uso del Análisis JPEG
+
+```bash
+# Activar análisis JPEG en modo interactivo
+python liveness_cli.py --interactive
+
+# Responder "y" cuando pregunte por análisis JPEG
 ```
 
 ## ⚙️ Opciones
@@ -92,6 +114,7 @@ python liveness_cli.py --directory ruta/a/imagenes --use-saas --use-sdk --sdk-po
 ### Otras Opciones
 - `--workers`, `-w`: Número de workers para procesamiento paralelo
 - `--verbose`, `-v`: Mostrar información detallada durante la ejecución
+- `--analyze-jpeg-quality`: Analizar la calidad JPEG de las imágenes
 - `--interactive`, `-i`: Ejecutar en modo interactivo
 
 ## 🏗️ Estructura del Código
@@ -115,6 +138,7 @@ liveness-cli/
     ├── core/                  # Lógica de negocio central
     │   ├── __init__.py
     │   ├── image_processor.py # Procesamiento de imágenes
+    │   ├── jpeg_quality_analyzer.py # Análisis de calidad JPEG
     │   └── report_generator.py# Generación de reportes
     └── utils/                 # Utilidades y herramientas auxiliares
         ├── __init__.py
@@ -125,7 +149,7 @@ liveness-cli/
 ### Arquitectura
 
 - **`src/commands/`**: Comandos CLI separados por responsabilidad
-- **`src/core/`**: Lógica de negocio (procesamiento, reportes)
+- **`src/core/`**: Lógica de negocio (procesamiento, reportes, análisis JPEG)
 - **`src/utils/`**: Utilidades compartidas (configuración, helpers)
 - **`backup/`**: Versión original completa para referencia
 
@@ -139,6 +163,7 @@ El informe generado es un archivo Markdown con una tabla que incluye:
 - Imagen (miniatura)
 - Resolución
 - Tamaño
+- **Calidad JPEG** (si se habilitó el análisis)
 - Diagnóstico SaaS (si se habilitó)
 - Diagnóstico SDK para cada versión (si se habilitó)
 
@@ -156,9 +181,14 @@ El informe generado es un archivo Markdown con una tabla que incluye:
 python liveness_cli.py -i
 ```
 
+### Evaluación con Análisis JPEG
+```bash
+python liveness_cli.py --directory ./imagenes_test --use-saas --analyze-jpeg-quality --output ./informes/informe_jpeg.md
+```
+
 ### Evaluación Avanzada
 ```bash
-python liveness_cli.py --directory ./imagenes_test --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --output ./informes/informe_$(date +%Y%m%d).md --workers 10 --verbose
+python liveness_cli.py --directory ./imagenes_test --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --analyze-jpeg-quality --output ./informes/informe_$(date +%Y%m%d).md --workers 10 --verbose
 ```
 
 ## 🛠️ Solución de Problemas
@@ -166,3 +196,5 @@ python liveness_cli.py --directory ./imagenes_test --use-saas --use-sdk --sdk-po
 - **Error de conexión al SDK**: Asegúrate de que el servicio SDK esté ejecutándose en el puerto especificado.
 - **Error en la API SaaS**: Verifica que la API key sea válida y tengas conexión a Internet.
 - **Imágenes no encontradas**: Verifica las rutas proporcionadas para las imágenes o el directorio.
+- **Error en análisis JPEG**: El análisis de calidad JPEG requiere conexión a internet. Si falla, aparecerá "Error: [mensaje]" en la columna correspondiente del informe.
+- **"No es JPEG"**: El análisis de calidad solo funciona con archivos JPEG. Otros formatos mostrarán este mensaje.
