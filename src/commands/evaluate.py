@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comando para evaluar imágenes con servicios de liveness.
+🌱 Comando para evaluar imágenes con servicios de liveness.
 """
 
 import os

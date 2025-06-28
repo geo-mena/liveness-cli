@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Módulo para generar informes de evaluación de liveness en formato Markdown.
+🌱 Módulo para generar informes de evaluación de liveness en formato Markdown.
 """
 
 import os

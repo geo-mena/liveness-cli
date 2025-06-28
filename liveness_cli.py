@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Punto de entrada principal para el CLI de evaluación de liveness.
+🌱 Punto de entrada principal para el CLI de evaluación de liveness.
 """
 
 import sys

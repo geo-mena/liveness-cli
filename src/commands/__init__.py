@@ -1,3 +1,3 @@
 """
-Submódulo de comandos CLI.
+🌱 Submódulo de comandos CLI.
 """

@@ -1,3 +1,3 @@
 """
-Submódulo de lógica de negocio central.
+🌱 Submódulo de lógica de negocio central.
 """

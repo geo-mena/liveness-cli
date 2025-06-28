@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Script de instalación para el CLI de evaluación de liveness.
+🌱 Script de instalación para el CLI de evaluación de liveness.
 """
 
 from setuptools import setup, find_packages
@@ -14,9 +14,9 @@ with open("requirements.txt", "r", encoding="utf-8") as fh:
 setup(
     name="liveness-cli",
     version="1.1.0",
-    author="Equipo de Facephi",
+    author="Geovanny Mena",
     author_email="geovannymena@facephi.com",
-    description="CLI para evaluar imágenes con servicios de liveness",
+    description="CLI para evaluar imágenes con Idenity API y SDK de FacePhi.",
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://github.com/geo-mena/liveness-cli",

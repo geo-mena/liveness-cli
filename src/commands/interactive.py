@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Comando para ejecutar el CLI en modo interactivo.
+🌱 Comando para ejecutar el CLI en modo interactivo.
 """
 
 import inquirer

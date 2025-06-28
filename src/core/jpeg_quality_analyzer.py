@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-Analizador de calidad JPEG usando servicio web.
-Implementación simplificada que usa únicamente el endpoint externo.
+🌱 Analizador de calidad JPEG usando servicio web. Implementación simplificada que usa únicamente el endpoint externo.
 """
 
 import requests

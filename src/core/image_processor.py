@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Módulo para procesar y evaluar imágenes con servicios de liveness.
+🌱 Módulo para procesar y evaluar imágenes con servicios de liveness.
 """
 
 import os
