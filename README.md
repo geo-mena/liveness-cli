@@ -15,6 +15,7 @@ Una herramienta de línea de comandos para evaluar imágenes con servicios de li
 - [✨ Características](#-características)
 - [📦 Instalación](#-instalación)
 - [⚡ Uso](#-uso)
+- [🌄 Análisis de Calidad JPEG](#-análisis-de-calidad-jpeg)
 - [⚙️ Opciones](#️-opciones)
 - [🏗️ Estructura del Código](#️-estructura-del-código)
 - [📄 Formato del Informe](#-formato-del-informe)
@@ -75,7 +76,7 @@ python liveness_cli.py --directory ruta/a/imagenes --use-sdk --sdk-port 8080 --s
 python liveness_cli.py --directory ruta/a/imagenes --use-saas --use-sdk --sdk-port 8080 9090 --sdk-version "6.12" "6.5" --analyze-jpeg-quality --output informe.md
 ```
 
-## 🔍 Análisis de Calidad JPEG
+## 🌄 Análisis de Calidad JPEG
 
 El CLI incluye funcionalidad avanzada para analizar la calidad de compresión de imágenes JPEG:
 
