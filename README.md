@@ -27,7 +27,7 @@ Una herramienta de línea de comandos para evaluar imágenes con servicios de li
 
 - Evaluación de imágenes individuales o directorios completos
 - Integración con servicios SaaS (Identity Platform) y SDK local
-- **Análisis de calidad JPEG** mediante servicio web especializado
+- Opcional **Análisis de calidad JPEG**
 - Soporte para múltiples versiones del SDK (hasta 3)
 - Generación de informes en formato Markdown
 - Interfaz interactiva y modo de línea de comandos
@@ -80,10 +80,10 @@ python liveness_cli.py --directory ruta/a/imagenes --use-saas --use-sdk --sdk-po
 
 El CLI incluye funcionalidad avanzada para analizar la calidad de compresión de imágenes JPEG:
 
-- **Servicio web especializado**: Utiliza un endpoint externo para análisis preciso
+- **Análisis preciso**: Determina el porcentaje de calidad de compresión JPEG
 - **Solo imágenes JPEG**: La funcionalidad está diseñada específicamente para archivos JPEG
 - **Resultados numéricos**: Muestra el porcentaje de calidad (ej: 85%)
-- **Detección de errores**: Maneja casos de imágenes corruptas o conexión fallida
+- **Detección de errores**: Maneja casos de imágenes corruptas o no válidas
 
 ### Uso del Análisis JPEG
 
@@ -197,5 +197,5 @@ python liveness_cli.py --directory ./imagenes_test --use-saas --use-sdk --sdk-po
 - **Error de conexión al SDK**: Asegúrate de que el servicio SDK esté ejecutándose en el puerto especificado.
 - **Error en la API SaaS**: Verifica que la API key sea válida y tengas conexión a Internet.
 - **Imágenes no encontradas**: Verifica las rutas proporcionadas para las imágenes o el directorio.
-- **Error en análisis JPEG**: El análisis de calidad JPEG requiere conexión a internet. Si falla, aparecerá "Error: [mensaje]" en la columna correspondiente del informe.
+- **Error en análisis JPEG**: Si el análisis JPEG falla, aparecerá "Error: [mensaje]" en la columna correspondiente del informe.
 - **"No es JPEG"**: El análisis de calidad solo funciona con archivos JPEG. Otros formatos mostrarán este mensaje.
