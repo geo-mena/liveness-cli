@@ -67,6 +67,8 @@ class EvaluateCommand:
                           help="Número de workers para procesamiento paralelo")
         parser.add_argument("--verbose", "-v", action="store_true",
                           help="Mostrar información detallada durante la ejecución")
+        parser.add_argument("--analyze-jpeg-quality", action="store_true",
+                          help="Analizar la calidad JPEG de las imágenes (requiere dependencias adicionales)")
         
         return parser.parse_args()
     
@@ -83,15 +85,16 @@ class EvaluateCommand:
             output_path=args.output,
             workers=args.workers,
             verbose=args.verbose,
+            analyze_jpeg_quality=args.analyze_jpeg_quality,
         )
     
     def run_evaluation(self, image_path=None, directory_path=None, use_saas=False, 
                       saas_api_key=DEFAULT_SAAS_API_KEY, use_sdk=False, sdk_ports=None, 
                       sdk_versions=None, output_path="informe_liveness.md", workers=DEFAULT_WORKERS, 
-                      verbose=False):
+                      verbose=False, analyze_jpeg_quality=False):
         """Ejecuta la evaluación de imágenes."""
-        # Configurar el procesador de imágenes con verbosidad
-        image_processor = ImageProcessor(verbose=verbose)
+        # Configurar el procesador de imágenes con verbosidad y análisis JPEG
+        image_processor = ImageProcessor(verbose=verbose, analyze_jpeg_quality=analyze_jpeg_quality)
         
         # Recopilar imágenes para procesar
         images = []
@@ -175,6 +178,10 @@ class EvaluateCommand:
                     "Resolución": image_info["resolution"],
                     "Tamaño": image_info["size"]
                 }
+                
+                # Añadir información de calidad JPEG si está habilitada
+                if analyze_jpeg_quality and "jpeg_quality" in image_info:
+                    result["Calidad JPEG"] = image_info["jpeg_quality"]
                 
                 # Evaluar con SaaS
                 if use_saas:

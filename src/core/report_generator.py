@@ -37,11 +37,20 @@ class MarkdownReportGenerator:
         header += " | ".join(fixed_columns) + " | "
         header_separator += " | ".join(["-" * len(col) for col in fixed_columns]) + " | "
         
+        # Añadir columnas de análisis JPEG si están presentes
+        jpeg_columns = []
+        if "Calidad JPEG" in results[0]:
+            jpeg_columns.append("Calidad JPEG")
+        
+        if jpeg_columns:
+            header += " | ".join(jpeg_columns) + " | "
+            header_separator += " | ".join(["-" * len(col) for col in jpeg_columns]) + " | "
+        
         # Añadir columnas dinámicas (SaaS y SDK versiones)
-        dynamic_columns = [col for col in results[0].keys() if col.startswith("Diagnostic")]
-        if dynamic_columns:
-            header += " | ".join(dynamic_columns) + " |"
-            header_separator += " | ".join(["-" * len(col) for col in dynamic_columns]) + " |"
+        diagnostic_columns = [col for col in results[0].keys() if col.startswith("Diagnostic")]
+        if diagnostic_columns:
+            header += " | ".join(diagnostic_columns) + " |"
+            header_separator += " | ".join(["-" * len(col) for col in diagnostic_columns]) + " |"
         else:
             # Eliminar el último " | " si no hay columnas dinámicas
             header = header[:-3] + " |"
@@ -57,9 +66,13 @@ class MarkdownReportGenerator:
             # Añadir columnas fijas
             row += f"<img src=\"{result['ImagePath']}\" width=\"{self.image_width}\" height=\"{self.image_height}\" alt=\"Photo\"> | {result['Resolución']} | {result['Tamaño']} | "
             
+            # Añadir columnas de análisis JPEG
+            if jpeg_columns:
+                row += " | ".join([result.get(col, "N/A") for col in jpeg_columns]) + " | "
+            
             # Añadir columnas dinámicas
-            if dynamic_columns:
-                row += " | ".join([result[col] for col in dynamic_columns]) + " |"
+            if diagnostic_columns:
+                row += " | ".join([result.get(col, "N/A") for col in diagnostic_columns]) + " |"
             else:
                 # Eliminar el último " | " si no hay columnas dinámicas
                 row = row[:-3] + " |"

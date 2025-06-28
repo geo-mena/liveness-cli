@@ -153,6 +153,19 @@ class InteractiveCommand:
         report_answers = inquirer.prompt(report_questions)
         output_path = report_answers['output']
         
+        # Configuración de análisis JPEG
+        jpeg_analysis = False
+        if image_path or directory_path:
+            jpeg_questions = [
+                inquirer.Confirm(
+                    'analyze_jpeg',
+                    message='¿Desea analizar la calidad JPEG de las imágenes?',
+                    default=False,
+                ),
+            ]
+            jpeg_answers = inquirer.prompt(jpeg_questions)
+            jpeg_analysis = jpeg_answers['analyze_jpeg']
+        
         # Otras configuraciones
         other_questions = [
             inquirer.Text(
@@ -185,6 +198,7 @@ class InteractiveCommand:
         self.console.print(f"Informe: {output_path}")
         self.console.print(f"Workers: {workers}")
         self.console.print(f"Verbose: {verbose}")
+        self.console.print(f"Análisis JPEG: {'Habilitado' if jpeg_analysis else 'Deshabilitado'}")
         
         confirm_question = [
             inquirer.Confirm(
@@ -211,4 +225,5 @@ class InteractiveCommand:
             output_path=output_path,
             workers=workers,
             verbose=verbose,
+            analyze_jpeg_quality=jpeg_analysis,
         )
