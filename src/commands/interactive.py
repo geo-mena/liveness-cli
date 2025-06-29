@@ -98,6 +98,8 @@ class InteractiveCommand:
         content.append("██║     ██║╚██╗ ██╔╝██╔══╝  ██║╚██╗██║██╔══╝  ╚════██║╚════██║\n", style="bold rgb(217,120,87)")
         content.append("███████╗██║ ╚████╔╝ ███████╗██║ ╚████║███████╗███████║███████║\n", style="bold rgb(217,120,87)")
         content.append("╚══════╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝\n", style="bold rgb(217,120,87)")
+        content.append("\n")
+        content.append("                        v1.0 | CLI Tool", style="dim white")
         
         panel = Panel(
             Align.center(content),
