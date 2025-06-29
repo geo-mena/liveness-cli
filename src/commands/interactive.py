@@ -9,6 +9,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 from rich.align import Align
+from rich.table import Table
 
 from src.utils.config import DEFAULT_SAAS_API_KEY, DEFAULT_WORKERS
 from src.commands.evaluate import EvaluateCommand
@@ -281,20 +282,26 @@ class InteractiveCommand:
         verbose = other_answers['verbose']
         
         # Confirmar la configuración
-        self.console.print("\n[bold blue]Resumen de configuración:[/bold blue]")
+        table = Table(title="Resumen de configuración", border_style="rgb(217,120,87)")
+        table.add_column("Configuración")
+        table.add_column("Valor", style="dim white")
+        
         if image_path:
-            self.console.print(f"Imagen: {image_path}")
+            table.add_row("Imagen", image_path)
         if directory_path:
-            self.console.print(f"Directorio: {directory_path}")
+            table.add_row("Directorio", directory_path)
         if service_answers['use_saas']:
-            self.console.print(f"SaaS API Key: {saas_api_key[:5]}...{saas_api_key[-5:]}")
+            table.add_row("SaaS API Key", f"{saas_api_key[:5]}...{saas_api_key[-5:]}")
         if service_answers['use_sdk']:
             for i, (port, version) in enumerate(zip(sdk_ports, sdk_versions)):
-                self.console.print(f"SDK {i+1}: Puerto {port}, Versión {version}")
-        self.console.print(f"Informe: {output_path}")
-        self.console.print(f"Workers: {workers}")
-        self.console.print(f"Verbose: {verbose}")
-        self.console.print(f"Análisis JPEG: {'Habilitado' if jpeg_analysis else 'Deshabilitado'}")
+                table.add_row(f"SDK {i+1}", f"Puerto {port}, Versión {version}")
+        table.add_row("Informe", output_path)
+        table.add_row("Workers", str(workers))
+        table.add_row("Verbose", "Sí" if verbose else "No")
+        table.add_row("Análisis JPEG", "Habilitado" if jpeg_analysis else "Deshabilitado")
+        
+        self.console.print("\n")
+        self.console.print(table)
         
         confirm_question = [
             inquirer.Confirm(
