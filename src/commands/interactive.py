@@ -22,7 +22,7 @@ class CustomTheme(GreenPassion):
         self.Question.mark_color = '\x1b[38;2;217;120;87m'
         self.Question.brackets_color = '\x1b[38;2;217;120;87m'
         self.List.selection_color = '\x1b[38;2;217;120;87m'
-        self.List.selection_cursor = '\x1b[38;2;217;120;87m❯\x1b[0m'
+        self.List.selection_cursor = '❯'
 
 class InteractiveCommand:
     """Comando para ejecutar el CLI en modo interactivo."""
