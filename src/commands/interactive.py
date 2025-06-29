@@ -45,7 +45,7 @@ class InteractiveCommand:
         content.append("███████╗██║ ╚████╔╝ ███████╗██║ ╚████║███████╗███████║███████║\n", style="bold rgb(217,120,87)")
         content.append("╚══════╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝\n", style="bold rgb(217,120,87)")
         content.append("\n")
-        content.append("                        v1.0 | CLI Tool", style="dim white")
+        content.append("                        📦️ v1.0 | CLI Tool", style="dim white")
         
         panel = Panel(
             Align.center(content),
@@ -93,7 +93,7 @@ class InteractiveCommand:
             directory_path_question = [
                 inquirer.Path(
                     'path',
-                    message='Ingrese la ruta al directorio de imágenes:',
+                    message='Ingrese la ruta al directorio de imágenes',
                     exists=True,
                     path_type=inquirer.Path.DIRECTORY,
                 ),
