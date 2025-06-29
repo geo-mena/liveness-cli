@@ -4,6 +4,7 @@
 """
 
 import inquirer
+from inquirer.themes import GreenPassion
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
@@ -13,12 +14,22 @@ from src.utils.config import DEFAULT_SAAS_API_KEY, DEFAULT_WORKERS
 from src.commands.evaluate import EvaluateCommand
 from src.core.image_processor import ImageProcessor
 
+#! TEMA PERSONALIZADO PARA INQUIRER
+class CustomTheme(GreenPassion):
+    def __init__(self):
+        super(CustomTheme, self).__init__()
+        self.Question.mark_color = '\x1b[38;2;217;120;87m'
+        self.Question.brackets_color = '\x1b[38;2;217;120;87m'
+        self.List.selection_color = '\x1b[38;2;217;120;87m'
+        self.List.selection_cursor = '\x1b[38;2;217;120;87m❯\x1b[0m'
+
 class InteractiveCommand:
     """Comando para ejecutar el CLI en modo interactivo."""
     
     def __init__(self):
         self.console = Console()
         self.evaluate_cmd = EvaluateCommand()
+        self.theme = CustomTheme()
     
     def show_banner(self):
         """Muestra la cabecera estilizada del CLI."""
@@ -117,7 +128,7 @@ class InteractiveCommand:
                 ],
             ),
         ]
-        image_answers = inquirer.prompt(image_questions)
+        image_answers = inquirer.prompt(image_questions, theme=self.theme)
         
         if image_answers['source'] == 'image':
             image_path_question = [
@@ -128,7 +139,7 @@ class InteractiveCommand:
                     path_type=inquirer.Path.FILE,
                 ),
             ]
-            image_path_answer = inquirer.prompt(image_path_question)
+            image_path_answer = inquirer.prompt(image_path_question, theme=self.theme)
             image_path = image_path_answer['path']
             directory_path = None
         else:
@@ -140,7 +151,7 @@ class InteractiveCommand:
                     path_type=inquirer.Path.DIRECTORY,
                 ),
             ]
-            directory_path_answer = inquirer.prompt(directory_path_question)
+            directory_path_answer = inquirer.prompt(directory_path_question, theme=self.theme)
             directory_path = directory_path_answer['path']
             image_path = None
         
@@ -157,7 +168,7 @@ class InteractiveCommand:
                 default=True,
             ),
         ]
-        service_answers = inquirer.prompt(service_questions)
+        service_answers = inquirer.prompt(service_questions, theme=self.theme)
         
         # Configuración del SaaS
         saas_api_key = DEFAULT_SAAS_API_KEY
@@ -169,7 +180,7 @@ class InteractiveCommand:
                     default=DEFAULT_SAAS_API_KEY,
                 ),
             ]
-            saas_answers = inquirer.prompt(saas_questions)
+            saas_answers = inquirer.prompt(saas_questions, theme=self.theme)
             saas_api_key = saas_answers['api_key']
         
         # Configuración del SDK
@@ -188,7 +199,7 @@ class InteractiveCommand:
                     ],
                 ),
             ]
-            sdk_count_answer = inquirer.prompt(sdk_count_question)
+            sdk_count_answer = inquirer.prompt(sdk_count_question, theme=self.theme)
             sdk_count = sdk_count_answer['count']
             
             # Configurar cada versión del SDK
@@ -206,7 +217,7 @@ class InteractiveCommand:
                         default=f"v{i+1}",
                     ),
                 ]
-                sdk_config_answers = inquirer.prompt(sdk_config_questions)
+                sdk_config_answers = inquirer.prompt(sdk_config_questions, theme=self.theme)
                 
                 # Verificar si el puerto está abierto
                 port = int(sdk_config_answers['port'])
@@ -219,7 +230,7 @@ class InteractiveCommand:
                             default=False,
                         ),
                     ]
-                    confirm_answer = inquirer.prompt(confirm_question)
+                    confirm_answer = inquirer.prompt(confirm_question, theme=self.theme)
                     if not confirm_answer['continue']:
                         continue
                 
@@ -235,7 +246,7 @@ class InteractiveCommand:
                 path_type=inquirer.Path.FILE,
             ),
         ]
-        report_answers = inquirer.prompt(report_questions)
+        report_answers = inquirer.prompt(report_questions, theme=self.theme)
         output_path = report_answers['output']
         
         # Configuración de análisis JPEG
@@ -248,7 +259,7 @@ class InteractiveCommand:
                     default=False,
                 ),
             ]
-            jpeg_answers = inquirer.prompt(jpeg_questions)
+            jpeg_answers = inquirer.prompt(jpeg_questions, theme=self.theme)
             jpeg_analysis = jpeg_answers['analyze_jpeg']
         
         # Otras configuraciones
@@ -265,7 +276,7 @@ class InteractiveCommand:
                 default=False,
             ),
         ]
-        other_answers = inquirer.prompt(other_questions)
+        other_answers = inquirer.prompt(other_questions, theme=self.theme)
         workers = int(other_answers['workers'])
         verbose = other_answers['verbose']
         
@@ -292,7 +303,7 @@ class InteractiveCommand:
                 default=True,
             ),
         ]
-        confirm_answer = inquirer.prompt(confirm_question)
+        confirm_answer = inquirer.prompt(confirm_question, theme=self.theme)
         
         if not confirm_answer['confirm']:
             self.console.print("[bold yellow]Operación cancelada por el usuario.[/bold yellow]")
