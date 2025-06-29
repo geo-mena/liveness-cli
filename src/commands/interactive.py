@@ -246,7 +246,6 @@ class InteractiveCommand:
         table.add_row("Verbose", "Sí" if verbose else "No")
         table.add_row("Análisis JPEG", "Habilitado" if jpeg_analysis else "Deshabilitado")
         
-        self.console.print("\n")
         self.console.print(table)
         
         confirm_question = [
