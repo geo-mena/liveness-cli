@@ -34,62 +34,8 @@ class InteractiveCommand:
     
     def show_banner(self):
         """Muestra la cabecera estilizada del CLI."""
+        
         #! BANNER ASCII ART PARA "LIVENESS CLI"
-        banner_text = Text()
-        banner_text.append("██████  ", style="bold cyan")
-        banner_text.append("██      ", style="bold blue")
-        banner_text.append("██    ██ ", style="bold cyan")
-        banner_text.append("███████ ", style="bold blue")
-        banner_text.append("██    ██ ", style="bold cyan")
-        banner_text.append("███████ ", style="bold blue")
-        banner_text.append("███████ ", style="bold cyan")
-        banner_text.append("███████ ", style="bold blue")
-        banner_text.append("\n", style="")
-        
-        banner_text.append("██   ██ ", style="bold cyan")
-        banner_text.append("██      ", style="bold blue")
-        banner_text.append("██    ██ ", style="bold cyan")
-        banner_text.append("██      ", style="bold blue")
-        banner_text.append("██    ██ ", style="bold cyan")
-        banner_text.append("██      ", style="bold blue")
-        banner_text.append("██      ", style="bold cyan")
-        banner_text.append("██      ", style="bold blue")
-        banner_text.append("\n", style="")
-        
-        banner_text.append("██   ██ ", style="bold cyan")
-        banner_text.append("██      ", style="bold blue")
-        banner_text.append("██    ██ ", style="bold cyan")
-        banner_text.append("█████   ", style="bold blue")
-        banner_text.append("██ ██ ██ ", style="bold cyan")
-        banner_text.append("█████   ", style="bold blue")
-        banner_text.append("███████ ", style="bold cyan")
-        banner_text.append("███████ ", style="bold blue")
-        banner_text.append("\n", style="")
-        
-        banner_text.append("██   ██ ", style="bold cyan")
-        banner_text.append("██      ", style="bold blue")
-        banner_text.append("██    ██ ", style="bold cyan")
-        banner_text.append("██      ", style="bold blue")
-        banner_text.append("██  █  ██ ", style="bold cyan")
-        banner_text.append("██      ", style="bold blue")
-        banner_text.append("     ██ ", style="bold cyan")
-        banner_text.append("     ██ ", style="bold blue")
-        banner_text.append("\n", style="")
-        
-        banner_text.append("███████ ", style="bold cyan")
-        banner_text.append("██████  ", style="bold blue")
-        banner_text.append(" ██████  ", style="bold cyan")
-        banner_text.append("███████ ", style="bold blue")
-        banner_text.append("██     ██ ", style="bold cyan")
-        banner_text.append("███████ ", style="bold blue")
-        banner_text.append("███████ ", style="bold cyan")
-        banner_text.append("███████ ", style="bold blue")
-        banner_text.append("\n\n", style="")
-        
-        # Texto simplificado y estilizado
-        title = Text("LIVENESS CLI", style="bold bright_white on blue")
-        
-        # Crear el panel con todo el contenido
         content = Text()
         content.append("\n")
         content.append("██╗     ██╗██╗   ██╗███████╗███╗   ██╗███████╗███████╗███████╗\n", style="bold rgb(217,120,87)")
