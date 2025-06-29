@@ -243,7 +243,7 @@ class InteractiveCommand:
             inquirer.Path(
                 'output',
                 message='Ingrese la ruta donde guardar el informe:',
-                default='informe_liveness.md',
+                default='reports/informe_liveness.md',
                 path_type=inquirer.Path.FILE,
             ),
         ]

@@ -59,7 +59,7 @@ class EvaluateCommand:
         
         # Argumentos para el informe
         report_group = parser.add_argument_group("Configuración del informe")
-        report_group.add_argument("--output", "-o", type=str, default="informe_liveness.md",
+        report_group.add_argument("--output", "-o", type=str, default="reports/informe_liveness.md",
                                 help="Ruta donde guardar el informe generado")
         
         # Otros argumentos
@@ -90,7 +90,7 @@ class EvaluateCommand:
     
     def run_evaluation(self, image_path=None, directory_path=None, use_saas=False, 
                       saas_api_key=DEFAULT_SAAS_API_KEY, use_sdk=False, sdk_ports=None, 
-                      sdk_versions=None, output_path="informe_liveness.md", workers=DEFAULT_WORKERS, 
+                      sdk_versions=None, output_path="reports/informe_liveness.md", workers=DEFAULT_WORKERS, 
                       verbose=False, analyze_jpeg_quality=False):
         """Ejecuta la evaluación de imágenes."""
         # Configurar el procesador de imágenes con verbosidad y análisis JPEG
