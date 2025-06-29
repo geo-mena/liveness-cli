@@ -28,56 +28,73 @@ class MarkdownReportGenerator:
         if not results:
             return ""
         
-        # Crear encabezado de la tabla
-        header = "| Title | "
-        header_separator = "| ----- | "
-        
-        # Añadir columnas fijas
-        fixed_columns = ["Photo", "Resolution", "Size"]
-        header += " | ".join(fixed_columns) + " | "
-        header_separator += " | ".join(["-" * len(col) for col in fixed_columns]) + " | "
+        # Crear encabezado HTML de la tabla
+        header_columns = ["Title", "Photo", "Resolution", "Size"]
         
         # Añadir columnas de análisis JPEG si están presentes
         jpeg_columns = []
         if "Calidad JPEG" in results[0]:
             jpeg_columns.append("Calidad JPEG")
-        
-        if jpeg_columns:
-            header += " | ".join(jpeg_columns) + " | "
-            header_separator += " | ".join(["-" * len(col) for col in jpeg_columns]) + " | "
+            header_columns.extend(jpeg_columns)
         
         # Añadir columnas dinámicas (SaaS y SDK versiones)
         diagnostic_columns = [col for col in results[0].keys() if col.startswith("Diagnostic")]
         if diagnostic_columns:
-            header += " | ".join(diagnostic_columns) + " |"
-            header_separator += " | ".join(["-" * len(col) for col in diagnostic_columns]) + " |"
-        else:
-            # Eliminar el último " | " si no hay columnas dinámicas
-            header = header[:-3] + " |"
-            header_separator = header_separator[:-3] + " |"
+            header_columns.extend(diagnostic_columns)
         
-        # Iniciar contenido del informe
-        report_content = f"{header}\n{header_separator}\n"
+        # Iniciar contenido del informe con tabla HTML y estilos CSS
+        report_content = """<style>
+table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 20px 0;
+}
+table, th, td {
+    border: 1px solid #ddd;
+}
+th, td {
+    padding: 8px;
+    text-align: center;
+}
+th {
+    font-weight: bold;
+}
+</style>
+
+<table>
+<thead>
+<tr>
+"""
+        for col in header_columns:
+            report_content += f"<th>{col}</th>"
+        report_content += "</tr>\n</thead>\n<tbody>\n"
         
         # Añadir filas
         for result in results:
-            row = f"| {result['Title']} | "
+            report_content += "<tr>"
             
-            # Añadir columnas fijas
-            row += f"<img src=\"{result['ImagePath']}\" width=\"{self.image_width}\" height=\"{self.image_height}\" alt=\"Photo\"> | {result['Resolución']} | {result['Tamaño']} | "
+            # Columna Title
+            report_content += f"<td>{result['Title']}</td>"
             
-            # Añadir columnas de análisis JPEG
-            if jpeg_columns:
-                row += " | ".join([result.get(col, "N/A") for col in jpeg_columns]) + " | "
+            # Columna Photo
+            report_content += f"<td><img src=\"{result['ImagePath']}\" width=\"{self.image_width}\" height=\"{self.image_height}\" alt=\"Photo\"></td>"
             
-            # Añadir columnas dinámicas
-            if diagnostic_columns:
-                row += " | ".join([result.get(col, "N/A") for col in diagnostic_columns]) + " |"
-            else:
-                # Eliminar el último " | " si no hay columnas dinámicas
-                row = row[:-3] + " |"
+            # Columnas fijas
+            report_content += f"<td>{result['Resolución']}</td>"
+            report_content += f"<td>{result['Tamaño']}</td>"
             
-            report_content += f"{row}\n"
+            # Columnas de análisis JPEG
+            for col in jpeg_columns:
+                report_content += f"<td>{result.get(col, 'N/A')}</td>"
+            
+            # Columnas dinámicas
+            for col in diagnostic_columns:
+                report_content += f"<td>{result.get(col, 'N/A')}</td>"
+            
+            report_content += "</tr>\n"
+        
+        # Cerrar tabla HTML
+        report_content += "</tbody>\n</table>"
         
         # Guardar informe
         with open(self.output_path, "w", encoding="utf-8") as f:
