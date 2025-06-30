@@ -246,6 +246,5 @@ class EvaluateCommand:
         elapsed_time = time.time() - start_time
         self.console.print(f"[bold green]Evaluación completada en {elapsed_time:.2f} segundos.[/bold green]")
         self.console.print(f"[bold green]Informe generado en: {report_generator.output_path}[/bold green]")
-        self.console.print(f"[bold green]Directorio con fecha: {report_generator.dated_directory}[/bold green]")
         
         return True
