@@ -49,6 +49,7 @@ table {
     border-collapse: collapse;
     width: 100%;
     margin: 20px 0;
+    table-layout: fixed;
 }
 table, th, td {
     border: 1px solid #ddd;
@@ -56,9 +57,30 @@ table, th, td {
 th, td {
     padding: 8px;
     text-align: center;
+    vertical-align: middle;
 }
 th {
     font-weight: bold;
+}
+/* Columnas con ancho fijo */
+th:nth-child(1), td:nth-child(1) { /* Title */
+    width: 150px;
+    word-wrap: break-word;
+}
+th:nth-child(2), td:nth-child(2) { /* Photo */
+    width: 150px;
+}
+/* Columnas responsivas */
+th:nth-child(n+3), td:nth-child(n+3) {
+    width: auto;
+    min-width: 80px;
+}
+/* Estilos para imágenes */
+img {
+    max-width: 100%;
+    height: auto;
+    max-height: 160px;
+    object-fit: contain;
 }
 </style>
 
@@ -78,7 +100,7 @@ th {
             report_content += f"<td>{result['Title']}</td>"
             
             # Columna Photo
-            report_content += f"<td><img src=\"{result['ImagePath']}\" width=\"{self.image_width}\" height=\"{self.image_height}\" alt=\"Photo\"></td>"
+            report_content += f"<td><img src=\"{result['ImagePath']}\" alt=\"Photo\"></td>"
             
             # Columnas fijas
             report_content += f"<td>{result['Resolución']}</td>"
