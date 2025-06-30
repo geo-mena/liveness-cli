@@ -64,11 +64,11 @@ th {
 }
 /* Columnas con ancho fijo */
 th:nth-child(1), td:nth-child(1) { /* Title */
-    width: 150px;
+    width: 120px;
     word-wrap: break-word;
 }
 th:nth-child(2), td:nth-child(2) { /* Photo */
-    width: 150px;
+    width: 120px;
 }
 /* Columnas responsivas */
 th:nth-child(n+3), td:nth-child(n+3) {
