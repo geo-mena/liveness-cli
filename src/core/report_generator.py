@@ -5,13 +5,14 @@
 
 import os
 from typing import List, Dict
-from src.utils.helpers import ensure_directory_exists
+from src.utils.helpers import ensure_directory_exists, create_report_path_with_date
 
 class MarkdownReportGenerator:
     """Clase para generar informes en formato Markdown."""
     
     def __init__(self, output_path: str, image_dir: str):
-        self.output_path = output_path
+        # Crear ruta con subdirectorio de fecha y manejo de duplicados
+        self.output_path, self.dated_directory = create_report_path_with_date(output_path)
         self.image_dir = image_dir
 
         # Dimensiones estándar para las imágenes

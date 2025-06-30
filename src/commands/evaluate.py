@@ -144,10 +144,15 @@ class EvaluateCommand:
                 if not image_processor.check_port_open(port):
                     self.console.print(f"[bold yellow]Advertencia: El puerto {port} parece estar cerrado. Asegúrese de que el servicio SDK esté ejecutándose en ese puerto.[/bold yellow]")
         
-        # Crear directorio temporal para imágenes procesadas (si no existe)
-        output_dir = os.path.dirname(os.path.abspath(output_path))
-        temp_img_dir = os.path.join(output_dir, "temp_images")
+        # Generar informe con directorio temporal ajustado
+        report_generator = MarkdownReportGenerator(output_path, "")
+        
+        # Crear directorio temporal para imágenes procesadas dentro del directorio con fecha
+        temp_img_dir = os.path.join(report_generator.dated_directory, "temp_images")
         os.makedirs(temp_img_dir, exist_ok=True)
+        
+        # Actualizar el directorio de imágenes del generador
+        report_generator.image_dir = temp_img_dir
         
         # Iniciar procesamiento de imágenes
         self.console.print(f"[bold green]Iniciando evaluación de {len(images)} imágenes...[/bold green]")
@@ -235,12 +240,12 @@ class EvaluateCommand:
         
         # Generar informe
         self.console.print("[bold green]Generando informe...[/bold green]")
-        report_generator = MarkdownReportGenerator(output_path, temp_img_dir)
         report_generator.generate_report(results)
         
         # Mostrar resumen
         elapsed_time = time.time() - start_time
         self.console.print(f"[bold green]Evaluación completada en {elapsed_time:.2f} segundos.[/bold green]")
-        self.console.print(f"[bold green]Informe generado en: {output_path}[/bold green]")
+        self.console.print(f"[bold green]Informe generado en: {report_generator.output_path}[/bold green]")
+        self.console.print(f"[bold green]Directorio con fecha: {report_generator.dated_directory}[/bold green]")
         
         return True
