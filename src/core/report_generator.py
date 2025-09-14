@@ -34,8 +34,8 @@ class MarkdownReportGenerator:
         
         # Añadir columnas de análisis JPEG si están presentes
         jpeg_columns = []
-        if "Calidad JPEG" in results[0]:
-            jpeg_columns.append("Calidad JPEG")
+        if "JPEG Quality" in results[0]:
+            jpeg_columns.append("JPEG Quality")
             header_columns.extend(jpeg_columns)
         
         # Añadir columnas dinámicas (SaaS y SDK versiones)

@@ -186,7 +186,7 @@ class EvaluateCommand:
                 
                 # Añadir información de calidad JPEG si está habilitada
                 if analyze_jpeg_quality and "jpeg_quality" in image_info:
-                    result["Calidad JPEG"] = image_info["jpeg_quality"]
+                    result["JPEG Quality"] = image_info["jpeg_quality"]
                 
                 # Evaluar con SaaS
                 if use_saas:
