@@ -32,37 +32,7 @@ class InteractiveCommand:
         self.evaluate_cmd = EvaluateCommand()
         self.theme = CustomTheme()
     
-    def show_banner(self):
-        """Muestra la cabecera estilizada del CLI."""
-        
-        #! BANNER ASCII ART PARA "LIVENESS CLI"
-        content = Text()
-        content.append("\n")
-        content.append("██╗     ██╗██╗   ██╗███████╗███╗   ██╗███████╗███████╗███████╗\n", style="bold rgb(217,120,87)")
-        content.append("██║     ██║██║   ██║██╔════╝████╗  ██║██╔════╝██╔════╝██╔════╝\n", style="bold rgb(217,120,87)")
-        content.append("██║     ██║██║   ██║█████╗  ██╔██╗ ██║█████╗  ███████╗███████╗\n", style="bold rgb(217,120,87)")
-        content.append("██║     ██║╚██╗ ██╔╝██╔══╝  ██║╚██╗██║██╔══╝  ╚════██║╚════██║\n", style="bold rgb(217,120,87)")
-        content.append("███████╗██║ ╚████╔╝ ███████╗██║ ╚████║███████╗███████║███████║\n", style="bold rgb(217,120,87)")
-        content.append("╚══════╝╚═╝  ╚═══╝  ╚══════╝╚═╝  ╚═══╝╚══════╝╚══════╝╚══════╝\n", style="bold rgb(217,120,87)")
-        content.append("\n")
-        content.append("                        v1.0 | CLI Tool", style="dim white")
-        
-        panel = Panel(
-            Align.center(content),
-            border_style="rgb(217,120,87)",
-            padding=(1, 2),
-            title="[bold bright_white]🚀 Bienvenido[/bold bright_white]",
-            title_align="center"
-        )
-        
-        self.console.print("\n")
-        self.console.print(panel)
-        self.console.print("\n")
-    
-    def run(self):
-        """Ejecuta el CLI en modo interactivo."""
-        # Mostrar la cabecera estilizada
-        self.show_banner()
+    def run_liveness_flow(self):
         
         # Preguntar por la fuente de las imágenes
         image_questions = [
@@ -76,7 +46,10 @@ class InteractiveCommand:
             ),
         ]
         image_answers = inquirer.prompt(image_questions, theme=self.theme)
-        
+
+        if not image_answers:
+            return False
+
         if image_answers['source'] == 'image':
             image_path_question = [
                 inquirer.Path(
@@ -87,6 +60,8 @@ class InteractiveCommand:
                 ),
             ]
             image_path_answer = inquirer.prompt(image_path_question, theme=self.theme)
+            if not image_path_answer:
+                return False
             image_path = image_path_answer['path']
             directory_path = None
         else:
@@ -99,6 +74,8 @@ class InteractiveCommand:
                 ),
             ]
             directory_path_answer = inquirer.prompt(directory_path_question, theme=self.theme)
+            if not directory_path_answer:
+                return False
             directory_path = directory_path_answer['path']
             image_path = None
         
@@ -116,6 +93,8 @@ class InteractiveCommand:
             ),
         ]
         service_answers = inquirer.prompt(service_questions, theme=self.theme)
+        if not service_answers:
+            return False
         
         # Configuración del SaaS
         saas_api_key = DEFAULT_SAAS_API_KEY
@@ -128,6 +107,8 @@ class InteractiveCommand:
                 ),
             ]
             saas_answers = inquirer.prompt(saas_questions, theme=self.theme)
+            if not saas_answers:
+                return False
             saas_api_key = saas_answers['api_key']
         
         # Configuración del SDK
@@ -147,6 +128,8 @@ class InteractiveCommand:
                 ),
             ]
             sdk_count_answer = inquirer.prompt(sdk_count_question, theme=self.theme)
+            if not sdk_count_answer:
+                return False
             sdk_count = sdk_count_answer['count']
             
             # Configurar cada versión del SDK
@@ -165,7 +148,9 @@ class InteractiveCommand:
                     ),
                 ]
                 sdk_config_answers = inquirer.prompt(sdk_config_questions, theme=self.theme)
-                
+                if not sdk_config_answers:
+                    return False
+
                 # Verificar si el puerto está abierto
                 port = int(sdk_config_answers['port'])
                 if not image_processor.check_port_open(port):
@@ -178,6 +163,8 @@ class InteractiveCommand:
                         ),
                     ]
                     confirm_answer = inquirer.prompt(confirm_question, theme=self.theme)
+                    if not confirm_answer:
+                        return False
                     if not confirm_answer['continue']:
                         continue
                 
@@ -194,6 +181,8 @@ class InteractiveCommand:
             ),
         ]
         report_answers = inquirer.prompt(report_questions, theme=self.theme)
+        if not report_answers:
+            return False
         output_path = report_answers['output']
         
         # Configuración de análisis JPEG
@@ -207,6 +196,8 @@ class InteractiveCommand:
                 ),
             ]
             jpeg_answers = inquirer.prompt(jpeg_questions, theme=self.theme)
+            if not jpeg_answers:
+                return False
             jpeg_analysis = jpeg_answers['analyze_jpeg']
         
         # Otras configuraciones
@@ -224,6 +215,8 @@ class InteractiveCommand:
             ),
         ]
         other_answers = inquirer.prompt(other_questions, theme=self.theme)
+        if not other_answers:
+            return False
         workers = int(other_answers['workers'])
         verbose = other_answers['verbose']
         
@@ -256,7 +249,9 @@ class InteractiveCommand:
             ),
         ]
         confirm_answer = inquirer.prompt(confirm_question, theme=self.theme)
-        
+        if not confirm_answer:
+            return False
+
         if not confirm_answer['confirm']:
             self.console.print("[bold yellow]Operación cancelada por el usuario.[/bold yellow]")
             return False
@@ -275,3 +270,8 @@ class InteractiveCommand:
             verbose=verbose,
             analyze_jpeg_quality=jpeg_analysis,
         )
+
+    def run(self):
+        from src.commands.menu import MenuCommand
+        menu_cmd = MenuCommand()
+        return menu_cmd.run()
