@@ -6,6 +6,7 @@ from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
 from rich.align import Align
+import os
 
 from src.commands.interactive import InteractiveCommand
 
@@ -35,29 +36,25 @@ class MenuCommand:
             self.s3_cmd = None
 
     def show_banner(self):
+        current_dir = os.getcwd()
 
         content = Text()
-        content.append("\n")
-        content.append("███████╗██╗   ██╗██████╗ ██████╗  ██████╗ ██████╗ ████████╗\n", style="bold rgb(217,120,87)")
-        content.append("██╔════╝██║   ██║██╔══██╗██╔══██╗██╔═══██╗██╔══██╗╚══██╔══╝\n", style="bold rgb(217,120,87)")
-        content.append("███████╗██║   ██║██████╔╝██████╔╝██║   ██║██████╔╝   ██║   \n", style="bold rgb(217,120,87)")
-        content.append("╚════██║██║   ██║██╔═══╝ ██╔═══╝ ██║   ██║██╔══██╗   ██║   \n", style="bold rgb(217,120,87)")
-        content.append("███████║╚██████╔╝██║     ██║     ╚██████╔╝██║  ██║   ██║   \n", style="bold rgb(217,120,87)")
-        content.append("╚══════╝ ╚═════╝ ╚═╝     ╚═╝      ╚═════╝ ╚═╝  ╚═╝   ╚═╝   \n", style="bold rgb(217,120,87)")
-        content.append("\n")
-        content.append("                   v1.0 | CLI Tool Backend", style="dim white")
+        content.append("* ¡Bienvenido a Support CLI!\n\n", style="bold rgb(217,120,87)")
+        content.append("  Herramienta desarrollada por el equipo de backend\n\n", style="dim italic white")
+        content.append(f"  cwd: {current_dir}", style="dim white")
 
         panel = Panel(
-            Align.center(content),
+            content,
             border_style="rgb(217,120,87)",
             padding=(1, 2),
-            title="[bold bright_white]Bienvenido[/bold bright_white]",
-            title_align="center"
+            expand=False
         )
 
         self.console.print("\n")
         self.console.print(panel)
-        self.console.print("\n")
+        self.console.print("\nOpciones disponibles:\n", style="dim white")
+        self.console.print("  * Prueba de vida: Verifica autenticidad facial mediante selfies", style="dim white")
+        self.console.print("  * S3: Descarga y gestión de reportes desde AWS\n", style="dim white")
 
     def show_menu(self):
         choices = [('Prueba de vida', 'liveness')]
