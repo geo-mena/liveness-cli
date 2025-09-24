@@ -39,7 +39,7 @@ class MenuCommand:
         current_dir = os.getcwd()
 
         content = Text()
-        content.append("⚹ ¡Bienvenido a Support CLI!\n\n", style="bold rgb(217,120,87)")
+        content.append("* ¡Bienvenido a Support CLI!\n\n", style="bold rgb(217,120,87)")
         content.append("  Herramienta desarrollada por el equipo de backend\n\n", style="dim italic white")
         content.append(f"  cwd: {current_dir}", style="dim white")
 
@@ -53,8 +53,8 @@ class MenuCommand:
         self.console.print("\n")
         self.console.print(panel)
         self.console.print("\nOpciones disponibles:\n", style="dim white")
-        self.console.print("  󠁯•󠁏󠁏 Prueba de vida: Verifica autenticidad facial mediante selfies", style="dim white")
-        self.console.print("  󠁯•󠁏󠁏 S3: Descarga y gestión de reportes desde AWS\n", style="dim white")
+        self.console.print("  * Prueba de vida: Verifica autenticidad facial mediante selfies", style="dim white")
+        self.console.print("  * S3: Descarga y gestión de reportes desde AWS\n", style="dim white")
 
     def show_menu(self):
         choices = [('Prueba de vida', 'liveness')]
